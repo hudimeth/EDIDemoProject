@@ -9,9 +9,6 @@ const Home = () => {
             <h5 className='text-center mb-5'>Use the links below to navigate</h5>
             <Row className='justify-content-md-center'>
                 <Col>
-                    <Button variant='primary' className='disabled w-100'>850-Purchase Order</Button>
-                </Col>
-                <Col>
                     <Button as={Link } to='create855' variant='warning' className='w-100'>855-Purchase Order Acknowledgement</Button>
                 </Col>
                 <Col>

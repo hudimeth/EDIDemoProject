@@ -28,7 +28,8 @@ namespace EDIConverterWeb.Data
                 ediText += $"PO1*{item.Index}*{item.QuantityOrdered}*{item.UnitOfMeasure}*{item.UnitPrice}**VN*{item.ItemNumber}~\n" +
                     $"ACK*IA***068*{doc.ScheduledShipDate.ToString("yyyyMMdd")}~\n";
             }
-            ediText += $"CTT*{doc.ItemsOrdered.Count}~AMT*TT*{GetTotalCost(doc.ItemsOrdered)}~\n" +
+            ediText += $"CTT*{doc.ItemsOrdered.Count}~\n" +
+                $"AMT*TT*{GetTotalCost(doc.ItemsOrdered)}~\n" +
                 $"SE*{(doc.ItemsOrdered.Count * 2) + 5}*{doc.TransactionNumber}~\n" +
                 $"GE*1*{doc.GroupNumber}~\n" +
                 $"IEA*1*{doc.InterchangeId}~\n";

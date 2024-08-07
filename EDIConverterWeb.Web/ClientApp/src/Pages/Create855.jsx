@@ -15,7 +15,7 @@ const Create855 = () => {
         itemsList: ''
     });
     const [poDate, setPoDate] = useState('');
-    const [testIndicator, setTestIndicator] = useState('p');
+    const [testIndicator, setTestIndicator] = useState('P');
     const [isValidForm, setIsValidForm] = useState(true);
 
     const isValidData = poDate.length === 8 && purchaseOrderAcknowledgement.purchaseOrderNumber.length && purchaseOrderAcknowledgement.itemsList && testIndicator
@@ -40,7 +40,7 @@ const Create855 = () => {
         if (testIndicator) {
             setTestIndicator(e.target.value);
         }
-        if (e.target.value === 't' || e.target.value === 'p') {
+        if (e.target.value === 'T' || e.target.value === 'P') {
             setTestIndicator(e.target.value);
         }
     }
@@ -185,7 +185,7 @@ const Create855 = () => {
                     <FloatingLabel className='gx-1 mx-2'
                         as={Col}
                         md={2}
-                        label='Test Indicator (p or t)'>
+                        label='Test Indicator (P or T)'>
                         <Form.Control type='text'
                             placeholder='Test Indicator'
                             maxLength='1'

@@ -17,7 +17,7 @@ namespace EDIConverterWeb.Data
         }
         public bool IsValid855Data(string purchaseOrderNum, string purchaseOrderDate, char testIndicator)
         {
-            bool isValidTestIndicator = testIndicator == 't' || testIndicator == 'p';
+            bool isValidTestIndicator = testIndicator == 'T' || testIndicator == 'P';
             DateTime dateValue;
             bool isValidDate = DateTime.TryParseExact(purchaseOrderDate, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateValue);
             return purchaseOrderNum.Length <= 22 && isValidTestIndicator && isValidDate;
@@ -38,7 +38,6 @@ namespace EDIConverterWeb.Data
             ctx.SaveChanges();
 
 
-            //these aren't getting set- figure it out, i think it's cuz i erased some code
             doc.TransactionNumber = GenerateTransactionNumber(doc.InterchangeId);
             doc.GroupNumber = GenerateGroupNumber(doc.InterchangeId);
             doc.ReferenceNumber = GenerateReferenceNumber(doc.InterchangeId);
