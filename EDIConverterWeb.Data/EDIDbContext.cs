@@ -23,26 +23,17 @@ namespace EDIConverterWeb.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PurchaseOrderAcknowledgement>()
-                .HasKey(poa => poa.InterchangeId);
+                .HasKey(poa => poa.ReferenceNumber);
 
             modelBuilder.Entity<PurchaseOrderAcknowledgement>(b =>
             {
                 b.ToTable("PurchaseOrderAcknowledgements");
-                b.Property(x => x.InterchangeId).ValueGeneratedOnAdd()
-                .UseIdentityColumn(100010001, 10001);
+                b.Property(x => x.ReferenceNumber).ValueGeneratedOnAdd()
+                .UseIdentityColumn(1000000001, 100001);
             });
-
-            ////these 2 don't work cuz they are considered identity columns and you are only allowed 1 identity column per table.
-            ////needa figure out how to do this without considering it an identity
-            //modelBuilder.Entity<PurchaseOrderAcknowledgement>()
-            //    .Property(poa => poa.InterchangeNumber).ValueGeneratedOnAdd()
-            //    .UseIdentityColumn(000000006, 1);
-
-            //modelBuilder.Entity<PurchaseOrderAcknowledgement>()
-            //    .Property(poa => poa.GroupNumber).ValueGeneratedOnAdd()
-            //    .UseIdentityColumn(00010, 1);
         }
 
+        public DbSet<User> Users { get; set; }
         public DbSet<PurchaseOrderAcknowledgement> PurchaseOrderAcknowledgements { get; set; }
         public DbSet<Item> ItemsOrdered { get; set; }
     }

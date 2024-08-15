@@ -10,21 +10,21 @@ namespace EDIConverterWeb.Data
 {
     public class PurchaseOrderAcknowledgementRepo
     {
-        private string _connectionString;
+        private readonly string _connectionString;
         public PurchaseOrderAcknowledgementRepo(string connectionString)
         {
             _connectionString = connectionString;
         }
-        public bool IsValid855Data(string purchaseOrderNum, string purchaseOrderDate, char testIndicator)
+        public bool IsValid855Data(string purchaseOrderNum, string purchaseOrderDate, char testIndicator, string PO1)
         {
             bool isValidTestIndicator = testIndicator == 'T' || testIndicator == 'P';
             DateTime dateValue;
             bool isValidDate = DateTime.TryParseExact(purchaseOrderDate, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateValue);
-            return purchaseOrderNum.Length <= 22 && isValidTestIndicator && isValidDate;
+            return purchaseOrderNum.Length <= 22 && isValidTestIndicator && isValidDate && IsValidPO1Lines(PO1);
         }
         public int AddDoc(string purchaseOrderNum, string purchaseOrderDate, char testIndicator, string itemsList)
         {
-            var ctx = new EDIDbContext(_connectionString);
+            using var ctx = new EDIDbContext(_connectionString);
             var doc = new PurchaseOrderAcknowledgement
             {
                 PurchaseOrderNumber = purchaseOrderNum,
@@ -38,19 +38,19 @@ namespace EDIConverterWeb.Data
             ctx.SaveChanges();
 
 
-            doc.TransactionNumber = GenerateTransactionNumber(doc.InterchangeId);
-            doc.GroupNumber = GenerateGroupNumber(doc.InterchangeId);
-            doc.ReferenceNumber = GenerateReferenceNumber(doc.InterchangeId);
+            doc.TransactionNumber = GenerateTransactionNumber(doc.ReferenceNumber);
+            doc.GroupNumber = GenerateGroupNumber(doc.ReferenceNumber);
+            doc.InterchangeNumber = GenerateInterchangeNumber(doc.ReferenceNumber);
             ctx.PurchaseOrderAcknowledgements.Update(doc);
             ctx.SaveChanges();
-            return doc.InterchangeId;
+            return doc.ReferenceNumber;
         }
         private string GenerateTransactionNumber(int num)
         {
             string numToString = num.ToString();
             if (string.IsNullOrWhiteSpace(numToString) || numToString.Length <= 5)
             {
-                return num.ToString();
+                return numToString;
             }
             else
             {
@@ -63,35 +63,54 @@ namespace EDIConverterWeb.Data
             string numToString = num.ToString();
             if (string.IsNullOrWhiteSpace(numToString))
             {
-                return num.ToString();
+                return numToString;
             }
             else
             {
-                var newNum = numToString.Substring(4);
+                var newNum = numToString.Substring(5);
                 return newNum;
             }
         }
-        private string GenerateReferenceNumber(int num)
+        private string GenerateInterchangeNumber(int num)
         {
             string numToString = num.ToString();
             if (string.IsNullOrWhiteSpace(numToString))
             {
-                return num.ToString();
+                return numToString;
             }
             else
             {
-                return "123" + numToString;
+                var newNum = numToString.Substring(numToString.Length - 9, 9);
+                if(newNum.Length < 9)
+                {   
+                    //make it fill with zeros if it's not 9 digits... or maybe it should invalidate...
+                }
+                return newNum;
             }
         }
-        private List<Item> ConvertPO1ListToItemList(string list)
+        private bool IsValidPO1Lines(string PO1)
         {
-            var newList = list.Replace(" ", "");
+            var newList = ReplaceSpacesAndNewLines(PO1);
+            if (newList[newList.Length - 1] != '~')
+            {
+                return false;
+            }
+            //working on the specific segments in separate project
+            return true;
+        }
+        private string ReplaceSpacesAndNewLines(string text)
+        {
+            return text.Replace(" ", "").ReplaceLineEndings("");
+        }
+        private List<Item> ConvertPO1ListToItemList(string PO1)
+        {
+            var newList = ReplaceSpacesAndNewLines(PO1);
             var items = new List<Item>();
             var itemString = "";
             for (int i = 0; i < newList.Length; i++)
             {
                 itemString += newList[i];
-                if (list[i] == '~')
+                if (newList[i] == '~')
                 {
                     var item = ConvertPO1ToItem(itemString);
                     items.Add(item);
@@ -115,7 +134,7 @@ namespace EDIConverterWeb.Data
                     //Console.WriteLine($"counter:{segmentCounter}");
                     if (segmentCounter == 2)
                     {
-                        item.Index = int.Parse(segment);
+                        item.LineNumber = int.Parse(segment);
                     }
                     if (segmentCounter == 3)
                     {

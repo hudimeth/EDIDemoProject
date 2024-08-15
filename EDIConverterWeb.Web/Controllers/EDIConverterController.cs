@@ -1,5 +1,6 @@
 ﻿using EDIConverterWeb.Data;
 using EDIConverterWeb.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -8,9 +9,10 @@ namespace EDIConverterWeb.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EDIConverterController : ControllerBase
     {
-        private string _connectionString;
+        private readonly string _connectionString;
         public EDIConverterController(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("ConStr");
@@ -21,10 +23,9 @@ namespace EDIConverterWeb.Web.Controllers
         public _855IdViewModel Create855(Create855ViewModel vm)
         {
             var repo = new PurchaseOrderAcknowledgementRepo(_connectionString);
-            var isValidInfo = repo.IsValid855Data(vm.PurchaseOrderNumber, vm.PurchaseOrderDate, vm.TestIndicator);
+            var isValidInfo = repo.IsValid855Data(vm.PurchaseOrderNumber, vm.PurchaseOrderDate, vm.TestIndicator, vm.ItemsList);
             if (isValidInfo)
             {
-                //before i enter the info, make it automatically delete the extra spaces from the po1 lines
                 var id = repo.AddDoc(vm.PurchaseOrderNumber, vm.PurchaseOrderDate, vm.TestIndicator, vm.ItemsList);
                 return new _855IdViewModel
                 {

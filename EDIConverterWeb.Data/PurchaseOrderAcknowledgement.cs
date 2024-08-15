@@ -12,21 +12,22 @@ namespace EDIConverterWeb.Data
     public class PurchaseOrderAcknowledgement
     { 
         [Key]
-        public int InterchangeId { get; set; }
-        //internally set, unique per 855 doc. starts at 100010001
+        public int ReferenceNumber { get; set; }
+        //1000000001
+        
+        public string InterchangeNumber { get; set; }
+        //000000001
+        public string GroupNumber { get; set; }
+        //00001
+        public string TransactionNumber { get; set; }
+        //10000
         public string PurchaseOrderNumber { get; set; }
-        //up to 22 characters
         public DateTime PurchaseOrderDate { get; set; }
-        public string ReferenceNumber { get; set; }
-        //autogenerate 12 digits
         public DateTime AcknowledgementDate { get; set; }
         public List<Item> ItemsOrdered { get; set; }
         public DateTime ScheduledShipDate { get; set; }
-        //autogenerate one week later than today's date
-        public string TransactionNumber { get; set; }
-        //autogenerate 5 digits
         public char TestIndicator { get; set; }
-        public string GroupNumber { get; set; }
-        //autogenerate 5 digits
+        
+        
     }
 }

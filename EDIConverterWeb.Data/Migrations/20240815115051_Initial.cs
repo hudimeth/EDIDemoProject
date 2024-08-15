@@ -13,20 +13,36 @@ namespace EDIConverterWeb.Data.Migrations
                 name: "PurchaseOrderAcknowledgements",
                 columns: table => new
                 {
-                    InterchangeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "100010001, 10001"),
+                    ReferenceNumber = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1000000001, 100001"),
+                    InterchangeNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GroupNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PurchaseOrderNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PurchaseOrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AcknowledgementDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ScheduledShipDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TransactionNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TestIndicator = table.Column<string>(type: "nvarchar(1)", nullable: false),
-                    GroupNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    TestIndicator = table.Column<string>(type: "nvarchar(1)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PurchaseOrderAcknowledgements", x => x.InterchangeId);
+                    table.PrimaryKey("PK_PurchaseOrderAcknowledgements", x => x.ReferenceNumber);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -35,7 +51,7 @@ namespace EDIConverterWeb.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Index = table.Column<int>(type: "int", nullable: false),
+                    LineNumber = table.Column<int>(type: "int", nullable: false),
                     QuantityOrdered = table.Column<int>(type: "int", nullable: false),
                     UnitOfMeasure = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -49,7 +65,7 @@ namespace EDIConverterWeb.Data.Migrations
                         name: "FK_ItemsOrdered_PurchaseOrderAcknowledgements_PurchaseOrderAcknowledgementId",
                         column: x => x.PurchaseOrderAcknowledgementId,
                         principalTable: "PurchaseOrderAcknowledgements",
-                        principalColumn: "InterchangeId",
+                        principalColumn: "ReferenceNumber",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -63,6 +79,9 @@ namespace EDIConverterWeb.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ItemsOrdered");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrderAcknowledgements");

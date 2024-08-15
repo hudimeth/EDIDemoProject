@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDIConverterWeb.Data.Migrations
 {
     [DbContext(typeof(EDIDbContext))]
-    [Migration("20240731102947_Initial")]
+    [Migration("20240815115051_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,11 +32,11 @@ namespace EDIConverterWeb.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("Index")
-                        .HasColumnType("int");
-
                     b.Property<string>("ItemNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LineNumber")
+                        .HasColumnType("int");
 
                     b.Property<int>("PurchaseOrderAcknowledgementId")
                         .HasColumnType("int");
@@ -60,11 +60,11 @@ namespace EDIConverterWeb.Data.Migrations
 
             modelBuilder.Entity("EDIConverterWeb.Data.PurchaseOrderAcknowledgement", b =>
                 {
-                    b.Property<int>("InterchangeId")
+                    b.Property<int>("ReferenceNumber")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InterchangeId"), 100010001L, 10001);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReferenceNumber"), 1000000001L, 100001);
 
                     b.Property<DateTime>("AcknowledgementDate")
                         .HasColumnType("datetime2");
@@ -72,13 +72,13 @@ namespace EDIConverterWeb.Data.Migrations
                     b.Property<string>("GroupNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("InterchangeNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("PurchaseOrderDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PurchaseOrderNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReferenceNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ScheduledShipDate")
@@ -91,9 +91,34 @@ namespace EDIConverterWeb.Data.Migrations
                     b.Property<string>("TransactionNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("InterchangeId");
+                    b.HasKey("ReferenceNumber");
 
                     b.ToTable("PurchaseOrderAcknowledgements", (string)null);
+                });
+
+            modelBuilder.Entity("EDIConverterWeb.Data.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("EDIConverterWeb.Data.Item", b =>

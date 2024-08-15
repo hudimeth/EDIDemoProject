@@ -20,7 +20,7 @@ const View855 = () => {
     }, [])
 
     return (
-        <Container className='pt-5'>
+        <Container>
             <pre>{ediText}</pre>
         </Container>
         )
