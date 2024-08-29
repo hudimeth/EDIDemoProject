@@ -4,11 +4,11 @@ import { Route, Routes } from 'react-router';
 import Create855 from './Pages/Create855';
 import Home from './Pages/Home';
 import View855 from './Pages/View855';
-import Signup from './Pages/Signup';
-import Login from './Pages/Login';
-import { AuthContextComponent } from './Components/AuthContextComponent';
-import PrivateRoute from './Components/PrivateRoute';
-import Logout from './Components/Logout';
+import AddUser from './Pages/Account/AddUser';
+import Login from './Pages/Account/Login';
+import { AuthContextComponent } from './Components/Authentication/AuthContextComponent';
+import PrivateRoute from './Components/Authentication/PrivateRoute';
+import Logout from './Components/Authentication/Logout';
 import Layout from './Components/Layout';
 
 const App = () => {
@@ -21,7 +21,7 @@ const App = () => {
                             <Home />
                         </PrivateRoute>
                     } />
-                    <Route exact path='/signup' element={<Signup />} />
+                    <Route exact path='/adduser' element={<AddUser />} />
                     <Route exact path='/login' element={<Login />} />
                     <Route exact path='/create855' element={
                         <PrivateRoute>

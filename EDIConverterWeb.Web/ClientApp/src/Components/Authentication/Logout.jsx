@@ -1,6 +1,6 @@
 ﻿import React, { useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from './AuthContextComponent';
+import { useAuth } from '../Authentication/AuthContextComponent';
 import { useNavigate } from 'react-router-dom';
 
 const Logout = () => {

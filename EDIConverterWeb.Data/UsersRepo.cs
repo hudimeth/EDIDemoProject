@@ -40,5 +40,10 @@ namespace EDIConverterWeb.Data
             using var ctx = new EDIDbContext(_connectionString);
             return ctx.Users.FirstOrDefault(u => u.Email == email);
         }
+        public bool UserExistsForThisEmail(string email)
+        {
+            using var ctx = new EDIDbContext(_connectionString);
+            return ctx.Users.Any(u => u.Email == email);
+        }
     }
 }

@@ -8,10 +8,10 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EDIConverterWeb.Data
 {
-    public class PurchaseOrderAcknowledgementRepo
+    public class Parse850Repo
     {
         private readonly string _connectionString;
-        public PurchaseOrderAcknowledgementRepo(string connectionString)
+        public Parse850Repo(string connectionString)
         {
             _connectionString = connectionString;
         }
@@ -88,14 +88,65 @@ namespace EDIConverterWeb.Data
                 return newNum;
             }
         }
-        private bool IsValidPO1Lines(string PO1)
+        public bool IsValidPO1Lines(string PO1)
         {
-            var newList = ReplaceSpacesAndNewLines(PO1);
-            if (newList[newList.Length - 1] != '~')
+            var withoutSpaces = ReplaceSpacesAndNewLines(PO1);
+            if (withoutSpaces[withoutSpaces.Length - 1] != '~')
             {
                 return false;
             }
-            //working on the specific segments in separate project
+            List<string[]> splitItemsList = withoutSpaces
+                .Split('~')
+                .Select(s => s.Split('*'))
+                .ToList();
+            if (splitItemsList[splitItemsList.Count() - 1][0] == "")
+            {
+                splitItemsList.RemoveAt(splitItemsList.Count() - 1);
+            };
+            foreach (string[] itemStringArr in splitItemsList)
+            {
+                if (itemStringArr.Length != 8)
+                {
+                    return false;
+                }
+                Console.WriteLine($"index 0: {itemStringArr[0]}");
+                if (itemStringArr[0] != "PO1")
+                {
+                    return false;
+                }
+                int lineNumber;
+                if (!int.TryParse(itemStringArr[1], out lineNumber) || int.Parse(itemStringArr[1]) > splitItemsList.Count())
+                {
+                    return false;
+                }
+                int quantity;
+                if (!int.TryParse(itemStringArr[2], out quantity))
+                {
+                    return false;
+                }
+                if (!Enum.IsDefined(typeof(UnitOfMeasure), itemStringArr[3]))
+                {
+                    return false;
+                }
+                decimal unitPrice;
+                if (!decimal.TryParse(itemStringArr[4], out unitPrice))
+                {
+                    //figure out how to make sure it has a decimal and 2 digits afterwards- not just numbers.
+                    return false;
+                }
+                if (itemStringArr[5] != "")
+                {
+                    return false;
+                }
+                if (itemStringArr[6] != "VN")
+                {
+                    return false;
+                }
+                if (itemStringArr[7] == "")
+                {
+                    return false;
+                }
+            }
             return true;
         }
         private string ReplaceSpacesAndNewLines(string text)

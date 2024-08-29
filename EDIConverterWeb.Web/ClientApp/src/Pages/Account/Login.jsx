@@ -1,7 +1,7 @@
 ﻿import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../Components/AuthContextComponent';
+import { useAuth } from '../../Components/Authentication/AuthContextComponent';
 import { Container, Button, Col, Form, Row, FloatingLabel } from 'react-bootstrap';
 
 const Login = () => {

@@ -22,7 +22,7 @@ namespace EDIConverterWeb.Web.Controllers
         [Route("create855")]
         public _855IdViewModel Create855(Create855ViewModel vm)
         {
-            var repo = new PurchaseOrderAcknowledgementRepo(_connectionString);
+            var repo = new Parse850Repo(_connectionString);
             var isValidInfo = repo.IsValid855Data(vm.PurchaseOrderNumber, vm.PurchaseOrderDate, vm.TestIndicator, vm.ItemsList);
             if (isValidInfo)
             {

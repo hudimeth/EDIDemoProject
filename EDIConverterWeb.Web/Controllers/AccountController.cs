@@ -19,17 +19,26 @@ namespace EDIConverterWeb.Web.Controllers
         }
 
         [HttpPost]
-        [Route("signup")]
-        public void Signup(SignupViewModel vm)
+        [Route("adduser")]
+        public IsValidAddUserDataViewModel AddUser(AddUserViewModel vm)
         {
             var repo = new UsersRepo(_connectionString);
-            var user = new User
+            var userExists = repo.UserExistsForThisEmail(vm.Email);
+            var passwordsMatch = vm.Password == vm.PasswordConfirmation;
+            if (!userExists && passwordsMatch)
             {
-                FirstName = vm.FirstName,
-                LastName = vm.LastName,
-                Email = vm.Email
+                repo.AddUser(new User
+                {
+                    FirstName = vm.FirstName,
+                    LastName = vm.LastName,
+                    Email = vm.Email
+                }, vm.Password);
+            }
+            return new()
+            {
+                UserExistsForThisEmail = userExists,
+                PasswordsMatch = passwordsMatch
             };
-            repo.AddUser(user, vm.Password);
         }
 
         [HttpPost]

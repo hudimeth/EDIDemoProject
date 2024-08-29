@@ -3,9 +3,7 @@ import { Container, Button, Col, Form, Row, FloatingLabel} from 'react-bootstrap
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 
-const Signup = () => {
-    //didn't put extra validation logic here
-    //because we'll take this out
+const AddUser = () => {
 
     const navigate = useNavigate();
 
@@ -13,8 +11,12 @@ const Signup = () => {
         firstName: '',
         lastName: '',
         email: '',
-        password: ''
-    })
+        password: '',
+        passwordConfirmation: ''
+    });
+
+    const [userExistsForThisEmail, setUserExistsForThisEmail] = useState(false);
+    const [passwordsMatch, setPasswordsMatch] = useState(true);
 
     const onTextChange = e => {
         const copy = { ...formData }
@@ -24,16 +26,24 @@ const Signup = () => {
 
     const onFormSubmit = async e => {
         e.preventDefault();
-        await axios.post('/api/account/signup', formData);
-        navigate('/login');
+        const { data } = await axios.post('/api/account/adduser', formData);
+        const userExists = data.userExistsForThisEmail;
+        setUserExistsForThisEmail(userExists);
+        const passwordsMatch = data.passwordsMatch;
+        setPasswordsMatch(passwordsMatch);
+        if (!userExists & passwordsMatch) {
+            navigate('/login')
+        }
     }
 
     return (
         <Container className='container pt-5'>
             <Row style={{ display: 'flex', alignItems: 'center' }}>
                 <Container className='col-md-6 offset-md-3 bg light p-4 rounded shadow'>
-                    <h3 className='text-center' >Signup for a new account</h3>
+                    <h3 className='text-center' >New User Account</h3>
                     <Form onSubmit={onFormSubmit}>
+                        {userExistsForThisEmail && <h6 className='text-danger text-center'>An account exists with this email address. Please try again.</h6>}
+                        {!passwordsMatch && <h6 className='text-danger text-center'>Passwords don't match. Please try again.</h6>}
                         <FloatingLabel className='gx-1 my-2'
                             label='First Name'>
                             <Form.Control type='text'
@@ -66,6 +76,14 @@ const Signup = () => {
                                 value={formData.password}
                                 onChange={onTextChange} />
                         </FloatingLabel>
+                        <FloatingLabel className='gx-1 my-2'
+                            label='Confirm Password'>
+                            <Form.Control type='password'
+                                placeholder='Confirm Password'
+                                name='passwordConfirmation'
+                                value={formData.passwordConfirmation}
+                                onChange={onTextChange} />
+                        </FloatingLabel>
                         <Row>
                             <Col></Col>
                             <Col>
@@ -79,4 +97,4 @@ const Signup = () => {
         </Container>
     )
 }
-export default Signup;
+export default AddUser;
