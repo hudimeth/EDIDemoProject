@@ -1,4 +1,4 @@
-﻿import { Container, Nav, Navbar } from 'react-bootstrap';
+﻿import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useAuth } from './Authentication/AuthContextComponent';
 
@@ -17,7 +17,9 @@ const Layout = ({ children }) => {
                             {!user && <Nav.Link as={Link } to='/adduser'>Add User</Nav.Link>}
                             {!user && <Nav.Link as={Link} to='/login'>Login</Nav.Link>}
                             {!!user && <Nav.Link as={Link} to='/create855'>855</Nav.Link>}
-                            {!!user && <Nav.Link as={Link} to='/logout'>Logout</Nav.Link>}
+                            {!!user && <NavDropdown title={`${user.firstName} ${user.lastName}` }>
+                                <NavDropdown.Item as={Link } to='/logout'>Logout</NavDropdown.Item>
+                            </NavDropdown>}
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
