@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDIConverterWeb.Data.Migrations
 {
     [DbContext(typeof(EDIDbContext))]
-    [Migration("20240815115051_Initial")]
-    partial class Initial
+    [Migration("20240911084230_DeletedTestIndicator")]
+    partial class DeletedTestIndicator
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -38,7 +38,7 @@ namespace EDIConverterWeb.Data.Migrations
                     b.Property<int>("LineNumber")
                         .HasColumnType("int");
 
-                    b.Property<int>("PurchaseOrderAcknowledgementId")
+                    b.Property<int>("PurchaseOrderId")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantityOrdered")
@@ -53,12 +53,12 @@ namespace EDIConverterWeb.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PurchaseOrderAcknowledgementId");
+                    b.HasIndex("PurchaseOrderId");
 
                     b.ToTable("ItemsOrdered");
                 });
 
-            modelBuilder.Entity("EDIConverterWeb.Data.PurchaseOrderAcknowledgement", b =>
+            modelBuilder.Entity("EDIConverterWeb.Data.POAcknowledgement", b =>
                 {
                     b.Property<int>("ReferenceNumber")
                         .ValueGeneratedOnAdd()
@@ -75,25 +75,64 @@ namespace EDIConverterWeb.Data.Migrations
                     b.Property<string>("InterchangeNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PurchaseOrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PurchaseOrderNumber")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("ScheduledShipDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("TestIndicator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(1)");
 
                     b.Property<string>("TransactionNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ReferenceNumber");
 
+                    b.HasIndex("PurchaseOrderId")
+                        .IsUnique();
+
                     b.ToTable("PurchaseOrderAcknowledgements", (string)null);
+                });
+
+            modelBuilder.Entity("EDIConverterWeb.Data.PurchaseOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FacilityCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FacilityName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PurchaseOrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PurchaseOrderNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StreetAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PurchaseOrders");
                 });
 
             modelBuilder.Entity("EDIConverterWeb.Data.User", b =>
@@ -123,18 +162,31 @@ namespace EDIConverterWeb.Data.Migrations
 
             modelBuilder.Entity("EDIConverterWeb.Data.Item", b =>
                 {
-                    b.HasOne("EDIConverterWeb.Data.PurchaseOrderAcknowledgement", "PurchaseOrderAcknowledgement")
-                        .WithMany("ItemsOrdered")
-                        .HasForeignKey("PurchaseOrderAcknowledgementId")
+                    b.HasOne("EDIConverterWeb.Data.PurchaseOrder", "PurchaseOrder")
+                        .WithMany("LineItems")
+                        .HasForeignKey("PurchaseOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PurchaseOrderAcknowledgement");
+                    b.Navigation("PurchaseOrder");
                 });
 
-            modelBuilder.Entity("EDIConverterWeb.Data.PurchaseOrderAcknowledgement", b =>
+            modelBuilder.Entity("EDIConverterWeb.Data.POAcknowledgement", b =>
                 {
-                    b.Navigation("ItemsOrdered");
+                    b.HasOne("EDIConverterWeb.Data.PurchaseOrder", "PurchaseOrder")
+                        .WithOne("POAcknowledgement")
+                        .HasForeignKey("EDIConverterWeb.Data.POAcknowledgement", "PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PurchaseOrder");
+                });
+
+            modelBuilder.Entity("EDIConverterWeb.Data.PurchaseOrder", b =>
+                {
+                    b.Navigation("LineItems");
+
+                    b.Navigation("POAcknowledgement");
                 });
 #pragma warning restore 612, 618
         }

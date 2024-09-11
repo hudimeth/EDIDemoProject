@@ -4,6 +4,7 @@ using EDIConverterWeb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDIConverterWeb.Data.Migrations
 {
     [DbContext(typeof(EDIDbContext))]
-    partial class EDIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240904100231_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,6 +81,10 @@ namespace EDIConverterWeb.Data.Migrations
                     b.Property<DateTime>("ScheduledShipDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("TestIndicator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(1)");
+
                     b.Property<string>("TransactionNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -130,7 +136,7 @@ namespace EDIConverterWeb.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PurchaseOrders");
+                    b.ToTable("PurchaseOrder");
                 });
 
             modelBuilder.Entity("EDIConverterWeb.Data.User", b =>

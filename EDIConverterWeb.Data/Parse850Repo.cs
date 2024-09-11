@@ -15,78 +15,145 @@ namespace EDIConverterWeb.Data
         {
             _connectionString = connectionString;
         }
-        public bool IsValid855Data(string purchaseOrderNum, string purchaseOrderDate, char testIndicator, string PO1)
+        public int? AddDoc(string text)
         {
-            bool isValidTestIndicator = testIndicator == 'T' || testIndicator == 'P';
-            DateTime dateValue;
-            bool isValidDate = DateTime.TryParseExact(purchaseOrderDate, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateValue);
-            return purchaseOrderNum.Length <= 22 && isValidTestIndicator && isValidDate && IsValidPO1Lines(PO1);
-        }
-        public int AddDoc(string purchaseOrderNum, string purchaseOrderDate, char testIndicator, string itemsList)
-        {
+            var poData = Parse850Text(text);
+            if (poData == null)
+            {
+                return null;
+            }
             using var ctx = new EDIDbContext(_connectionString);
-            var doc = new PurchaseOrderAcknowledgement
+            var po = new PurchaseOrder
             {
-                PurchaseOrderNumber = purchaseOrderNum,
-                PurchaseOrderDate = DateTime.ParseExact(purchaseOrderDate, "yyyyMMdd", CultureInfo.CurrentCulture),
-                AcknowledgementDate = DateTime.Now,
-                ItemsOrdered = ConvertPO1ListToItemList(itemsList),
-                ScheduledShipDate = DateTime.Now.AddDays(7),
-                TestIndicator = testIndicator
-            };
-            ctx.PurchaseOrderAcknowledgements.Add(doc);
-            ctx.SaveChanges();
-
-
-            doc.TransactionNumber = GenerateTransactionNumber(doc.ReferenceNumber);
-            doc.GroupNumber = GenerateGroupNumber(doc.ReferenceNumber);
-            doc.InterchangeNumber = GenerateInterchangeNumber(doc.ReferenceNumber);
-            ctx.PurchaseOrderAcknowledgements.Update(doc);
-            ctx.SaveChanges();
-            return doc.ReferenceNumber;
-        }
-        private string GenerateTransactionNumber(int num)
-        {
-            string numToString = num.ToString();
-            if (string.IsNullOrWhiteSpace(numToString) || numToString.Length <= 5)
-            {
-                return numToString;
-            }
-            else
-            {
-                var newNum = numToString.Substring(0, 5);
-                return newNum;
-            }
-        }
-        private string GenerateGroupNumber(int num)
-        {
-            string numToString = num.ToString();
-            if (string.IsNullOrWhiteSpace(numToString))
-            {
-                return numToString;
-            }
-            else
-            {
-                var newNum = numToString.Substring(5);
-                return newNum;
-            }
-        }
-        private string GenerateInterchangeNumber(int num)
-        {
-            string numToString = num.ToString();
-            if (string.IsNullOrWhiteSpace(numToString))
-            {
-                return numToString;
-            }
-            else
-            {
-                var newNum = numToString.Substring(numToString.Length - 9, 9);
-                if(newNum.Length < 9)
-                {   
-                    //make it fill with zeros if it's not 9 digits... or maybe it should invalidate...
+                PurchaseOrderNumber = poData.PurchaseOrderNumber,
+                PurchaseOrderDate = poData.PurchaseOrderDate,
+                FacilityName = poData.FacilityName,
+                FacilityCode = poData.FacilityCode,
+                StreetAddress = poData.StreetAddress,
+                City = poData.City,
+                State = poData.State,
+                PostalCode = poData.PostalCode,
+                ContactName = poData.ContactName,
+                ContactNumber = poData.ContactNumber,
+                LineItems = poData.LineItems,
+                POAcknowledgement = new()
+                {
+                    AcknowledgementDate = DateTime.Now,
+                    ScheduledShipDate = poData.PurchaseOrderDate.AddDays(7)
                 }
-                return newNum;
+            };
+            ctx.PurchaseOrders.Add(po);
+            ctx.SaveChanges();
+            return po.POAcknowledgement.ReferenceNumber;
+        }
+        public PurchaseOrder Parse850Text(string text)
+        {
+            var oneLineText = text.ReplaceLineEndings("").Trim();
+            var segment = "";
+            var purchaseOrder = new PurchaseOrder();
+            string lineItemsText = "";
+
+            //now it only validates the info based on the lines and specific segments that we take info from
+            bool validBEGSegment = false;
+            bool validN1Segment = false;
+            bool validN3Segment = false;
+            bool validN4Segment = false;
+            bool validPERSegment = false;
+            bool validPO1Segment = false;
+
+            for (int i = 0; i < oneLineText.Length; i++)
+            {
+                segment += oneLineText[i];
+                if (oneLineText[i] == '~')
+                {
+                    if (segment.StartsWith("BEG"))
+                    {
+                        var newSegment = segment.Remove(segment.Length - 1);
+                        var eachBEGSegmentSeparated = newSegment.Split('*');
+                        if (eachBEGSegmentSeparated.Count() == 6)
+                        {
+                            if (eachBEGSegmentSeparated[0] != "" && eachBEGSegmentSeparated[3] != "" && eachBEGSegmentSeparated[5] != "")
+                            {
+                                validBEGSegment = true;
+                                purchaseOrder.PurchaseOrderNumber = eachBEGSegmentSeparated[3];
+                                purchaseOrder.PurchaseOrderDate = DateTime.ParseExact(eachBEGSegmentSeparated[5], "yyyyMMdd", CultureInfo.CurrentCulture);
+                            }
+                        }
+                    }
+                    else if (segment.StartsWith("N1"))
+                    {
+                        var newSegment = segment.Remove(segment.Length - 1);
+                        var eachN1SegmentSeparated = newSegment.Split('*');
+                        var noEmptySegments = eachN1SegmentSeparated[0] != "" && eachN1SegmentSeparated[2] != "" && eachN1SegmentSeparated[4] != "";
+                        if (eachN1SegmentSeparated.Count() == 5 && noEmptySegments)
+                        {
+                            validN1Segment = true;
+                            purchaseOrder.FacilityName = eachN1SegmentSeparated[2];
+                            purchaseOrder.FacilityCode = eachN1SegmentSeparated[4];
+                        }
+                    }
+                    else if (segment.StartsWith("N3"))
+                    {
+                        var newSegment = segment.Remove(segment.Length - 1);
+                        var eachN3SegmentSeparated = newSegment.Split('*');
+                        if (eachN3SegmentSeparated.Count() == 2)
+                        {
+                            if (eachN3SegmentSeparated[0] != "" && eachN3SegmentSeparated[1] != "")
+                            {
+                                validN3Segment = true;
+                                purchaseOrder.StreetAddress = eachN3SegmentSeparated[1];
+                            }
+                        }
+                    }
+                    else if (segment.StartsWith("N4"))
+                    {
+                        var newSegment = segment.Remove(segment.Length - 1);
+                        var eachN4SegmentSeparated = newSegment.Split('*');
+                        if (eachN4SegmentSeparated.Count() == 4)
+                        {
+                            if (eachN4SegmentSeparated[0] != "" && eachN4SegmentSeparated[1] != "" && eachN4SegmentSeparated[2] != "" && eachN4SegmentSeparated[3] != "")
+                            {
+                                validN4Segment = true;
+                                purchaseOrder.City = eachN4SegmentSeparated[1];
+                                purchaseOrder.State = eachN4SegmentSeparated[2];
+                                purchaseOrder.PostalCode = eachN4SegmentSeparated[3];
+                            }
+                        }
+                    }
+                    else if (segment.StartsWith("PER"))
+                    {
+                        var newSegment = segment.Remove(segment.Length - 1);
+                        var eachPERSegmentSeparated = newSegment.Split('*');
+                        if (eachPERSegmentSeparated.Count() == 5)
+                        {
+                            if (eachPERSegmentSeparated[0] != "" && eachPERSegmentSeparated[2] != "" && eachPERSegmentSeparated[4] != "")
+                            {
+                                validPERSegment = true;
+                                purchaseOrder.ContactName = eachPERSegmentSeparated[2];
+                                purchaseOrder.ContactNumber = eachPERSegmentSeparated[4];
+                            }
+                        }
+                    }
+                    if (segment.StartsWith("PO1"))
+                    {
+                        lineItemsText += segment;
+                    }
+                    segment = "";
+                }
             }
+            if (IsValidPO1Lines(lineItemsText))
+            {
+                validPO1Segment = true;
+                var lineItems = ConvertPO1TextToItemList(lineItemsText);
+                purchaseOrder.LineItems = lineItems;
+            }
+
+            var validData = validBEGSegment && validN1Segment && validN3Segment && validN4Segment && validPERSegment && validPO1Segment;
+            if (!validData)
+            {
+                return null;
+            }
+            return purchaseOrder;
         }
         public bool IsValidPO1Lines(string PO1)
         {
@@ -109,7 +176,6 @@ namespace EDIConverterWeb.Data
                 {
                     return false;
                 }
-                Console.WriteLine($"index 0: {itemStringArr[0]}");
                 if (itemStringArr[0] != "PO1")
                 {
                     return false;
@@ -131,7 +197,6 @@ namespace EDIConverterWeb.Data
                 decimal unitPrice;
                 if (!decimal.TryParse(itemStringArr[4], out unitPrice))
                 {
-                    //figure out how to make sure it has a decimal and 2 digits afterwards- not just numbers.
                     return false;
                 }
                 if (itemStringArr[5] != "")
@@ -153,7 +218,7 @@ namespace EDIConverterWeb.Data
         {
             return text.Replace(" ", "").ReplaceLineEndings("");
         }
-        private List<Item> ConvertPO1ListToItemList(string PO1)
+        private List<Item> ConvertPO1TextToItemList(string PO1)
         {
             var newList = ReplaceSpacesAndNewLines(PO1);
             var items = new List<Item>();
@@ -213,5 +278,6 @@ namespace EDIConverterWeb.Data
             }
             return item;
         }
+
     }
 }

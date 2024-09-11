@@ -14,25 +14,27 @@ namespace EDIConverterWeb.Data
         {
             _connectionString = connectionString;
         }
-        public string WritePurchaseOrderAcknowledgement(int poId)
+        public string WritePurchaseOrderAcknowledgement(int referenceNum)
         {
             using var ctx = new EDIDbContext(_connectionString);
-            var doc = ctx.PurchaseOrderAcknowledgements.Include(poa => poa.ItemsOrdered).FirstOrDefault(poa => poa.ReferenceNumber == poId);
-            var ediText = $"ISA*00*          *00*          *ZZ*TRISTATE       *ZZ*80040537744CRT *{doc.AcknowledgementDate.ToString("yyMMdd")}*{doc.AcknowledgementDate.ToString("HHmm")}*U*00401*{doc.InterchangeNumber}*0*{doc.TestIndicator}*>~\n" +
-                $"GS*PR*TRISTATE*80040537744CRT*{doc.AcknowledgementDate.ToString("yyyyMMdd")}*{doc.AcknowledgementDate.ToString("HHmm")}*{doc.GroupNumber}*X*004010~\n" +
-                $"ST*855*{doc.TransactionNumber}~\n" +
-                $"BAK*00*AC*{doc.PurchaseOrderNumber}*{doc.PurchaseOrderDate.ToString("yyyyMMdd")}****{doc.ReferenceNumber}*" +
-                $"{doc.AcknowledgementDate.ToString("yyyyMMdd")}~\n";
-            foreach (Item item in doc.ItemsOrdered.OrderBy(i => i.LineNumber))
+            var po = ctx.PurchaseOrders.Include(po => po.POAcknowledgement).Include(po => po.LineItems).FirstOrDefault(po => po.POAcknowledgement.ReferenceNumber == referenceNum);
+
+            var ediText = $"ISA*00*          *00*          *ZZ*TRISTATE       *ZZ*80040537744CRT *{po.POAcknowledgement.AcknowledgementDate.ToString("yyMMdd")}*{po.POAcknowledgement.AcknowledgementDate.ToString("HHmm")}*U*00401*{po.POAcknowledgement.InterchangeNumber}*0*P*>~\n" +
+                $"GS*PR*TRISTATE*80040537744CRT*{po.POAcknowledgement.AcknowledgementDate.ToString("yyyyMMdd")}*{po.POAcknowledgement.AcknowledgementDate.ToString("HHmm")}*{po.POAcknowledgement.GroupNumber}*X*004010~\n" +
+                $"ST*855*{po.POAcknowledgement.TransactionNumber}~\n" +
+                $"BAK*00*AC*{po.PurchaseOrderNumber}*{po.PurchaseOrderDate.ToString("yyyyMMdd")}****{po.POAcknowledgement.ReferenceNumber}*" +
+                $"{po.POAcknowledgement.AcknowledgementDate.ToString("yyyyMMdd")}~\n";
+            foreach (Item item in po.LineItems.OrderBy(i => i.LineNumber))
             {
                 ediText += $"PO1*{item.LineNumber}*{item.QuantityOrdered}*{item.UnitOfMeasure}*{item.UnitPrice}**VN*{item.ItemNumber}~\n" +
-                    $"ACK*IA***068*{doc.ScheduledShipDate.ToString("yyyyMMdd")}~\n";
+                    $"ACK*IA***068*{po.POAcknowledgement.ScheduledShipDate.ToString("yyyyMMdd")}~\n";
             }
-            ediText += $"CTT*{doc.ItemsOrdered.Count}~\n" +
-                $"AMT*TT*{GetTotalCost(doc.ItemsOrdered)}~\n" +
-                $"SE*{(doc.ItemsOrdered.Count * 2) + 5}*{doc.TransactionNumber}~\n" +
-                $"GE*1*{doc.GroupNumber}~\n" +
-                $"IEA*1*{doc.InterchangeNumber}~\n";
+            ediText += $"CTT*{po.LineItems.Count}~\n" +
+                //make sure to check that this total matches the total in the PO
+                $"AMT*TT*{GetTotalCost(po.LineItems)}~\n" +
+                $"SE*{(po.LineItems.Count * 2) + 5}*{po.POAcknowledgement.TransactionNumber}~\n" +
+                $"GE*1*{po.POAcknowledgement.GroupNumber}~\n" +
+                $"IEA*1*{po.POAcknowledgement.InterchangeNumber}~\n";
             return ediText;
         }
         private decimal GetTotalCost(List<Item> itemsList)

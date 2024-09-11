@@ -16,7 +16,7 @@ const Layout = ({ children }) => {
                         <Nav className="me-auto">
                             {!user && <Nav.Link as={Link } to='/adduser'>Add User</Nav.Link>}
                             {!user && <Nav.Link as={Link} to='/login'>Login</Nav.Link>}
-                            {!!user && <Nav.Link as={Link} to='/create855'>855</Nav.Link>}
+                            {!!user && <Nav.Link as={Link} to='/add850'>Enter 850</Nav.Link>}
                             {!!user && <NavDropdown title={`${user.firstName} ${user.lastName}` }>
                                 <NavDropdown.Item as={Link } to='/logout'>Logout</NavDropdown.Item>
                             </NavDropdown>}

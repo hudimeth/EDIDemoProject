@@ -5,18 +5,18 @@ import axios from 'axios';
 
 const View855 = () => {
 
-    const { id } = useParams();
-    console.log(id);
+    const { referenceNumber } = useParams();
 
     const [ediText, setEdiText] = useState('');
 
-    const view855 = async () => {
-        const { data } = await axios.get(`/api/ediconverter/view855/${id}`);
-        setEdiText(data.ediText)
+    const load855 = async () => {
+        const { data } = await axios.get(`/api/ediconverter/view855/?referenceNumber=${referenceNumber}`);
+        setEdiText(data.ediText);
     }
 
     useEffect(() => {
-        view855();
+        console.log(referenceNumber);
+        load855();
     }, [])
 
     return (

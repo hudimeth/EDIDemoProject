@@ -12,7 +12,7 @@ const Home = () => {
             <h5 className='text-center mb-5'>Use the links below to navigate</h5>
             <Row className='justify-content-md-center'>
                 <Col>
-                    <Button as={Link} to='create855' variant='primary' className='w-100'>855-Purchase Order Acknowledgement</Button>
+                    <Button as={Link} to='add850' variant='primary' className='w-100'>Enter 850- Purchase Order</Button>
                 </Col>
                 <Col>
                     <Button variant='primary' className='disabled w-100'>810-Invoice</Button>

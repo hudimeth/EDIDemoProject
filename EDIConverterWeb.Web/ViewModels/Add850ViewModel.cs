@@ -2,8 +2,8 @@
 
 namespace EDIConverterWeb.Web.ViewModels
 {
-    public class View855ViewModel
+    public class Add850ViewModel
     {
-        public string EdiText { get; set; }
+        public string PurchaseOrder { get; set; }
     }
 }

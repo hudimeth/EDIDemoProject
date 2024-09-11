@@ -19,34 +19,32 @@ namespace EDIConverterWeb.Web.Controllers
         }
 
         [HttpPost]
-        [Route("create855")]
-        public _855IdViewModel Create855(Create855ViewModel vm)
+        [Route("add850")]
+        public ReferenceNumber855ViewModel Add850(Add850ViewModel vm)
         {
-            var repo = new Parse850Repo(_connectionString);
-            var isValidInfo = repo.IsValid855Data(vm.PurchaseOrderNumber, vm.PurchaseOrderDate, vm.TestIndicator, vm.ItemsList);
-            if (isValidInfo)
+            var repo850 = new Parse850Repo(_connectionString);
+            var referenceNum855 = repo850.AddDoc(vm.PurchaseOrder);
+            if (referenceNum855.HasValue)
             {
-                var id = repo.AddDoc(vm.PurchaseOrderNumber, vm.PurchaseOrderDate, vm.TestIndicator, vm.ItemsList);
-                return new _855IdViewModel
-                {
-                    Id = id
-                };
+                var repo855 = new Create855Repo(_connectionString);
+                repo855.Generate855ControlNumbers(referenceNum855.Value);
             }
-            return new _855IdViewModel
+            return new ReferenceNumber855ViewModel
             {
-                Id = 0
+                Id = referenceNum855
             };
         }
 
         [HttpGet]
-        [Route("view855/{id}")]
-        public View855ViewModel View855(int id)
+        [Route("view855")]
+        public View855ViewModel View855(int referenceNumber)
         {
             var repo = new EDIFileWriterRepo(_connectionString);
             return new()
             {
-                EdiText = repo.WritePurchaseOrderAcknowledgement(id)
+                EdiText = repo.WritePurchaseOrderAcknowledgement(referenceNumber)
             };
         }
+
     }
 }

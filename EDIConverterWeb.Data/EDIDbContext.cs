@@ -22,10 +22,9 @@ namespace EDIConverterWeb.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<PurchaseOrderAcknowledgement>()
+            modelBuilder.Entity<POAcknowledgement>()
                 .HasKey(poa => poa.ReferenceNumber);
-
-            modelBuilder.Entity<PurchaseOrderAcknowledgement>(b =>
+            modelBuilder.Entity<POAcknowledgement>(b =>
             {
                 b.ToTable("PurchaseOrderAcknowledgements");
                 b.Property(x => x.ReferenceNumber).ValueGeneratedOnAdd()
@@ -34,7 +33,8 @@ namespace EDIConverterWeb.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<PurchaseOrderAcknowledgement> PurchaseOrderAcknowledgements { get; set; }
+        public DbSet<POAcknowledgement> PurchaseOrderAcknowledgements { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<Item> ItemsOrdered { get; set; }
     }
 }

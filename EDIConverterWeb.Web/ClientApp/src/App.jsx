@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Route, Routes } from 'react-router';
-import Create855 from './Pages/Create855';
+import Add850 from './Pages/Add850';
 import Home from './Pages/Home';
 import View855 from './Pages/View855';
 import AddUser from './Pages/Account/AddUser';
@@ -23,12 +23,12 @@ const App = () => {
                     } />
                     <Route exact path='/adduser' element={<AddUser />} />
                     <Route exact path='/login' element={<Login />} />
-                    <Route exact path='/create855' element={
+                    <Route exact path='/add850' element={
                         <PrivateRoute>
-                            <Create855 />
+                            <Add850 />
                         </PrivateRoute>
                     } />
-                    <Route exact path='/view855/:id' element={
+                    <Route exact path='/view855/:referenceNumber' element={
                         <PrivateRoute>
                             <View855 />
                         </PrivateRoute>

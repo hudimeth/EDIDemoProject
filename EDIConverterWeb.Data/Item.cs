@@ -18,9 +18,9 @@ namespace EDIConverterWeb.Data
         [Precision(18,2)]
         public decimal UnitPrice { get; set; }
         public string ItemNumber { get; set; }
-        public int PurchaseOrderAcknowledgementId { get; set; }
+        public int PurchaseOrderId { get; set; }
 
         [JsonIgnore]
-        public PurchaseOrderAcknowledgement PurchaseOrderAcknowledgement { get; set; }
+        public PurchaseOrder PurchaseOrder { get; set; }
     }
 }
