@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace EDIConverterWeb.Data
 {
-    public class Create855Repo
+    public class POAcknowledgementRepo
     {
         private readonly string _connectionString;
-        public Create855Repo(string connectionString)
+        public POAcknowledgementRepo(string connectionString)
         {
             _connectionString = connectionString;
         }

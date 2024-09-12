@@ -8,10 +8,10 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EDIConverterWeb.Data
 {
-    public class Parse850Repo
+    public class PurchaseOrderRepo
     {
         private readonly string _connectionString;
-        public Parse850Repo(string connectionString)
+        public PurchaseOrderRepo(string connectionString)
         {
             _connectionString = connectionString;
         }

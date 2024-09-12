@@ -53,7 +53,7 @@ namespace EDIConverterWeb.Data.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("ItemsOrdered");
+                    b.ToTable("LineItems");
                 });
 
             modelBuilder.Entity("EDIConverterWeb.Data.POAcknowledgement", b =>

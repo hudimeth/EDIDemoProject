@@ -35,6 +35,6 @@ namespace EDIConverterWeb.Data
         public DbSet<User> Users { get; set; }
         public DbSet<POAcknowledgement> PurchaseOrderAcknowledgements { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
-        public DbSet<Item> ItemsOrdered { get; set; }
+        public DbSet<Item> LineItems { get; set; }
     }
 }

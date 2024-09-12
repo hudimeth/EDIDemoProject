@@ -22,11 +22,11 @@ namespace EDIConverterWeb.Web.Controllers
         [Route("add850")]
         public ReferenceNumber855ViewModel Add850(Add850ViewModel vm)
         {
-            var repo850 = new Parse850Repo(_connectionString);
+            var repo850 = new PurchaseOrderRepo(_connectionString);
             var referenceNum855 = repo850.AddDoc(vm.PurchaseOrder);
             if (referenceNum855.HasValue)
             {
-                var repo855 = new Create855Repo(_connectionString);
+                var repo855 = new POAcknowledgementRepo(_connectionString);
                 repo855.Generate855ControlNumbers(referenceNum855.Value);
             }
             return new ReferenceNumber855ViewModel

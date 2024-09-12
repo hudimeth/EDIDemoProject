@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDIConverterWeb.Data.Migrations
 {
     [DbContext(typeof(EDIDbContext))]
-    [Migration("20240911084230_DeletedTestIndicator")]
-    partial class DeletedTestIndicator
+    [Migration("20240912084247_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -55,7 +55,7 @@ namespace EDIConverterWeb.Data.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("ItemsOrdered");
+                    b.ToTable("LineItems");
                 });
 
             modelBuilder.Entity("EDIConverterWeb.Data.POAcknowledgement", b =>

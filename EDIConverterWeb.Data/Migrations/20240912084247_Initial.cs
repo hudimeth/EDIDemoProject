@@ -10,7 +10,7 @@ namespace EDIConverterWeb.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "PurchaseOrder",
+                name: "PurchaseOrders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -28,7 +28,7 @@ namespace EDIConverterWeb.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PurchaseOrder", x => x.Id);
+                    table.PrimaryKey("PK_PurchaseOrders", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,7 +48,7 @@ namespace EDIConverterWeb.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ItemsOrdered",
+                name: "LineItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -62,11 +62,11 @@ namespace EDIConverterWeb.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ItemsOrdered", x => x.Id);
+                    table.PrimaryKey("PK_LineItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ItemsOrdered_PurchaseOrder_PurchaseOrderId",
+                        name: "FK_LineItems_PurchaseOrders_PurchaseOrderId",
                         column: x => x.PurchaseOrderId,
-                        principalTable: "PurchaseOrder",
+                        principalTable: "PurchaseOrders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -82,23 +82,22 @@ namespace EDIConverterWeb.Data.Migrations
                     TransactionNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AcknowledgementDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ScheduledShipDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TestIndicator = table.Column<string>(type: "nvarchar(1)", nullable: false),
                     PurchaseOrderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PurchaseOrderAcknowledgements", x => x.ReferenceNumber);
                     table.ForeignKey(
-                        name: "FK_PurchaseOrderAcknowledgements_PurchaseOrder_PurchaseOrderId",
+                        name: "FK_PurchaseOrderAcknowledgements_PurchaseOrders_PurchaseOrderId",
                         column: x => x.PurchaseOrderId,
-                        principalTable: "PurchaseOrder",
+                        principalTable: "PurchaseOrders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ItemsOrdered_PurchaseOrderId",
-                table: "ItemsOrdered",
+                name: "IX_LineItems_PurchaseOrderId",
+                table: "LineItems",
                 column: "PurchaseOrderId");
 
             migrationBuilder.CreateIndex(
@@ -111,7 +110,7 @@ namespace EDIConverterWeb.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ItemsOrdered");
+                name: "LineItems");
 
             migrationBuilder.DropTable(
                 name: "PurchaseOrderAcknowledgements");
@@ -120,7 +119,7 @@ namespace EDIConverterWeb.Data.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "PurchaseOrder");
+                name: "PurchaseOrders");
         }
     }
 }
