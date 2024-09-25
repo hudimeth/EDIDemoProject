@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace EDIConverterWeb.Data
         }
         public int? AddDoc(string text)
         {
-            var poData = Parse850Text(text);
+            var poData = ParsePurchaseOrder(text);
             if (poData == null)
             {
                 return null;
@@ -44,9 +45,9 @@ namespace EDIConverterWeb.Data
             };
             ctx.PurchaseOrders.Add(po);
             ctx.SaveChanges();
-            return po.POAcknowledgement.ReferenceNumber;
+            return po.Id;
         }
-        public PurchaseOrder Parse850Text(string text)
+        public PurchaseOrder ParsePurchaseOrder(string text)
         {
             var oneLineText = text.ReplaceLineEndings("").Trim();
             var segment = "";
@@ -144,7 +145,7 @@ namespace EDIConverterWeb.Data
             if (IsValidPO1Lines(lineItemsText))
             {
                 validPO1Segment = true;
-                var lineItems = ConvertPO1TextToItemList(lineItemsText);
+                var lineItems = ConvertLineItemsTextToItemsList(lineItemsText);
                 purchaseOrder.LineItems = lineItems;
             }
 
@@ -218,7 +219,7 @@ namespace EDIConverterWeb.Data
         {
             return text.Replace(" ", "").ReplaceLineEndings("");
         }
-        private List<Item> ConvertPO1TextToItemList(string PO1)
+        private List<Item> ConvertLineItemsTextToItemsList(string PO1)
         {
             var newList = ReplaceSpacesAndNewLines(PO1);
             var items = new List<Item>();
@@ -228,14 +229,14 @@ namespace EDIConverterWeb.Data
                 itemString += newList[i];
                 if (newList[i] == '~')
                 {
-                    var item = ConvertPO1ToItem(itemString);
+                    var item = ConvertItem(itemString);
                     items.Add(item);
                     itemString = "";
                 }
             }
             return items;
         }
-        private Item ConvertPO1ToItem(string PO1)
+        private Item ConvertItem(string PO1)
         {
             Console.WriteLine(PO1);
             var item = new Item();
@@ -278,6 +279,10 @@ namespace EDIConverterWeb.Data
             }
             return item;
         }
-
+        public string GetPurchaseOrderNumber(int purchaseOrderId)
+        {
+            using var ctx = new EDIDbContext(_connectionString);
+            return ctx.PurchaseOrders.FirstOrDefault(po => po.Id == purchaseOrderId).PurchaseOrderNumber;
+        }
     }
 }

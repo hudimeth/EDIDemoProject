@@ -14,7 +14,7 @@ namespace EDIConverterWeb.Data
         {
             _connectionString = connectionString;
         }
-        public string WritePurchaseOrderAcknowledgement(int referenceNum)
+        public string WritePOAcknowledgementText(int referenceNum)
         {
             using var ctx = new EDIDbContext(_connectionString);
             var po = ctx.PurchaseOrders.Include(po => po.POAcknowledgement).Include(po => po.LineItems).FirstOrDefault(po => po.POAcknowledgement.ReferenceNumber == referenceNum);
@@ -30,7 +30,6 @@ namespace EDIConverterWeb.Data
                     $"ACK*IA***068*{po.POAcknowledgement.ScheduledShipDate.ToString("yyyyMMdd")}~\n";
             }
             ediText += $"CTT*{po.LineItems.Count}~\n" +
-                //make sure to check that this total matches the total in the PO
                 $"AMT*TT*{GetTotalCost(po.LineItems)}~\n" +
                 $"SE*{(po.LineItems.Count * 2) + 5}*{po.POAcknowledgement.TransactionNumber}~\n" +
                 $"GE*1*{po.POAcknowledgement.GroupNumber}~\n" +
@@ -40,6 +39,32 @@ namespace EDIConverterWeb.Data
         private decimal GetTotalCost(List<Item> itemsList)
         {
             return itemsList.Select(i => i.UnitPrice * i.QuantityOrdered).Sum();
+        }
+        public string WritePurchaseOrderText(int purchaseOrderId)
+        {
+            using var ctx = new EDIDbContext(_connectionString);
+            var po = ctx.PurchaseOrders.Include(po => po.LineItems).FirstOrDefault(po => po.Id == purchaseOrderId);
+            var totalPrice = GetTotalCost(po.LineItems);
+            var purchaseOrderText = $"Purchase Order #: {po.PurchaseOrderNumber}\n" +
+                $"Purchase Order Date: {po.PurchaseOrderDate.ToString("MM/dd/yyyy")}\n" +
+                $"Customer Details:\n" +
+                $"\t\t\t{po.FacilityName}\n" +
+                $"\t\t\t{po.StreetAddress}\n" +
+                $"\t\t\t{po.City}, {po.State} {po.PostalCode}\n\n" +
+                $"\t\t\tFacility Code: {po.FacilityCode}\n\n" +
+                $"Contact Name: {po.ContactName}\n" +
+                $"Contact Number: {po.ContactNumber}\n\n" +
+                $"Line Items:\n";
+            foreach(Item i in po.LineItems.OrderBy(i => i.LineNumber))
+            {
+                purchaseOrderText += $"\tItem #{i.LineNumber}:\n" +
+                    $"\tQuantity: {i.QuantityOrdered}\n" +
+                    $"\tUnit of Measure: {i.UnitOfMeasure}\n" +
+                    $"\tUnit Price: {i.UnitPrice}\n" +
+                    $"\tItem Number: {i.ItemNumber}\n\n";
+            }
+            purchaseOrderText += $"Total Price: {totalPrice}";
+            return purchaseOrderText;
         }
     }
 }

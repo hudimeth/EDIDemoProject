@@ -14,17 +14,18 @@ namespace EDIConverterWeb.Data
             _connectionString = connectionString;
         }
 
-        public void Generate855ControlNumbers(int referenceNum)
+        public int GeneratePOAcknowledgementControlNumbers(int purchaseOrderId)
         {
             using var ctx = new EDIDbContext(_connectionString);
-            var poAcknowledgement = ctx.PurchaseOrderAcknowledgements.FirstOrDefault(poa => poa.ReferenceNumber == referenceNum);
-            poAcknowledgement.InterchangeNumber = GenerateInterchangeNumber(referenceNum);
-            poAcknowledgement.GroupNumber = GenerateGroupNumber(referenceNum);
-            poAcknowledgement.TransactionNumber = GenerateTransactionNumber(referenceNum);
+            var poAcknowledgement = ctx.PurchaseOrderAcknowledgements.FirstOrDefault(poa => poa.PurchaseOrder.Id == purchaseOrderId);
+            poAcknowledgement.InterchangeNumber = GenerateInterchangeNumber(poAcknowledgement.ReferenceNumber);
+            poAcknowledgement.GroupNumber = GenerateGroupNumber(poAcknowledgement.ReferenceNumber);
+            poAcknowledgement.TransactionNumber = GenerateTransactionNumber(poAcknowledgement.ReferenceNumber);
             ctx.Update(poAcknowledgement);
             ctx.SaveChanges();
+            return poAcknowledgement.ReferenceNumber;
         }
-        
+
         private string GenerateTransactionNumber(int referenceNum)
         {
             string numToString = referenceNum.ToString();

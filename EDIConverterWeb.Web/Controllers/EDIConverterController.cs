@@ -19,32 +19,43 @@ namespace EDIConverterWeb.Web.Controllers
         }
 
         [HttpPost]
-        [Route("add850")]
-        public ReferenceNumber855ViewModel Add850(Add850ViewModel vm)
+        [Route("addpurchaseorder")]
+        public IdsViewModel AddPurchaseOrder(Add850ViewModel vm)
         {
             var repo850 = new PurchaseOrderRepo(_connectionString);
-            var referenceNum855 = repo850.AddDoc(vm.PurchaseOrder);
-            if (referenceNum855.HasValue)
+            var purchaseOrderId = repo850.AddDoc(vm.PurchaseOrder);
+            int? referenceNumber = null;
+            string purchaseOrderNumber = "";
+            if (purchaseOrderId.HasValue)
             {
                 var repo855 = new POAcknowledgementRepo(_connectionString);
-                repo855.Generate855ControlNumbers(referenceNum855.Value);
+                referenceNumber = repo855.GeneratePOAcknowledgementControlNumbers(purchaseOrderId.Value);
+                purchaseOrderNumber = repo850.GetPurchaseOrderNumber(purchaseOrderId.Value);
             }
-            return new ReferenceNumber855ViewModel
+            return new IdsViewModel
             {
-                Id = referenceNum855
+                PurchaseOrderId = purchaseOrderId,
+                PurchaseOrderNumber = purchaseOrderNumber,
+                POAcknowledgementReferenceNumber = referenceNumber
             };
         }
 
         [HttpGet]
-        [Route("view855")]
-        public View855ViewModel View855(int referenceNumber)
+        [Route("get855file")]
+        public IActionResult Get855File(int referenceNumber)
         {
             var repo = new EDIFileWriterRepo(_connectionString);
-            return new()
-            {
-                EdiText = repo.WritePurchaseOrderAcknowledgement(referenceNumber)
-            };
+            var poAcknowledgementText = repo.WritePOAcknowledgementText(referenceNumber);
+            return File(Encoding.UTF8.GetBytes(poAcknowledgementText), "application/octet-stream");
         }
 
+        [HttpGet]
+        [Route("getpurchaseorderfile")]
+        public IActionResult GetPurchaseOrderFile(int purchaseOrderId)
+        {
+            var repo = new EDIFileWriterRepo(_connectionString);
+            var poText = repo.WritePurchaseOrderText(purchaseOrderId);
+            return File(Encoding.UTF8.GetBytes(poText), "application/octet-stream");
+        }
     }
 }
