@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../Components/Authentication/AuthContextComponent';
 import { Container, Button, Col, Form, Row, FloatingLabel } from 'react-bootstrap';
 
+
 const Login = () => {
 
     const { setUser } = useAuth();
@@ -55,7 +56,7 @@ const Login = () => {
                                 value={formData.password}
                                 onChange={onTextChange} />
                         </FloatingLabel>
-                        <Row>
+                        <Row className='mt-2'>
                             <Col></Col>
                             <Col>
                                 <Button variant="primary" className='w-100' type="submit">Login</Button>
@@ -64,6 +65,9 @@ const Login = () => {
                         </Row>
                     </Form>
                 </Container>
+            </Row>
+            <Row>
+
             </Row>
         </Container>
     )
