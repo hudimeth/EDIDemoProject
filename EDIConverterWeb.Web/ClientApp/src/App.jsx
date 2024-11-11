@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Route, Routes } from 'react-router';
 import AddPurchaseOrder from './Pages/AddPurchaseOrder';
 import Home from './Pages/Home';
-//import AddUser from './Pages/Account/AddUser';
+import AddUser from './Pages/Account/AddUser';
 import Login from './Pages/Account/Login';
 import { AuthContextComponent } from './Components/Authentication/AuthContextComponent';
 import PrivateRoute from './Components/Authentication/PrivateRoute';
@@ -20,7 +20,7 @@ const App = () => {
                             <Home />
                         </PrivateRoute>
                     } />
-                    {/*<Route exact path='/adduser' element={<AddUser />} />*/}
+                    <Route exact path='/adduser' element={<AddUser />} />
                     <Route exact path='/login' element={<Login />} />
                     <Route exact path='/addpurchaseorder' element={
                         <PrivateRoute>

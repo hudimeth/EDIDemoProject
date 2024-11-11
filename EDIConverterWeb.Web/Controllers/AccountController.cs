@@ -18,28 +18,28 @@ namespace EDIConverterWeb.Web.Controllers
             _connectionString = configuration.GetConnectionString("ConStr");
         }
 
-        //[HttpPost]
-        //[Route("adduser")]
-        //public IsValidAddUserDataViewModel AddUser(AddUserViewModel vm)
-        //{
-        //    var repo = new UsersRepo(_connectionString);
-        //    var userExists = repo.UserExistsForThisEmail(vm.Email);
-        //    var passwordsMatch = vm.Password == vm.PasswordConfirmation;
-        //    if (!userExists && passwordsMatch)
-        //    {
-        //        repo.AddUser(new User
-        //        {
-        //            FirstName = vm.FirstName,
-        //            LastName = vm.LastName,
-        //            Email = vm.Email
-        //        }, vm.Password);
-        //    }
-        //    return new()
-        //    {
-        //        UserExistsForThisEmail = userExists,
-        //        PasswordsMatch = passwordsMatch
-        //    };
-        //}
+        [HttpPost]
+        [Route("adduser")]
+        public IsValidAddUserDataViewModel AddUser(AddUserViewModel vm)
+        {
+            var repo = new UsersRepo(_connectionString);
+            var userExists = repo.UserExistsForThisEmail(vm.Email);
+            var passwordsMatch = vm.Password == vm.PasswordConfirmation;
+            if (!userExists && passwordsMatch)
+            {
+                repo.AddUser(new User
+                {
+                    FirstName = vm.FirstName,
+                    LastName = vm.LastName,
+                    Email = vm.Email
+                }, vm.Password);
+            }
+            return new()
+            {
+                UserExistsForThisEmail = userExists,
+                PasswordsMatch = passwordsMatch
+            };
+        }
 
         [HttpPost]
         [Route("login")]
