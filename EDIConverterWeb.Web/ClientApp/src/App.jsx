@@ -20,7 +20,7 @@ const App = () => {
                             <Home />
                         </PrivateRoute>
                     } />
-                   {/* <Route exact path='/adduser' element={<AddUser />} />*/}
+                    {/*<Route exact path='/adduser' element={<AddUser />} />*/}
                     <Route exact path='/login' element={<Login />} />
                     <Route exact path='/addpurchaseorder' element={
                         <PrivateRoute>
