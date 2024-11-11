@@ -13,18 +13,18 @@ namespace EDIConverterWeb.Data
         {
             _connectionString = connectionString;
         }
-        //public void AddUser(User user, string password)
-        //{
-        //    var hash = BCrypt.Net.BCrypt.HashPassword(password);
-        //    user.PasswordHash = hash;
-        //    using var ctx = new EDIDbContext(_connectionString);
-        //    ctx.Users.Add(user);
-        //    ctx.SaveChanges();
-        //}
+        public void AddUser(User user, string password)
+        {
+            var hash = BCrypt.Net.BCrypt.HashPassword(password);
+            user.PasswordHash = hash;
+            using var ctx = new EDIDbContext(_connectionString);
+            ctx.Users.Add(user);
+            ctx.SaveChanges();
+        }
         public User Login(string email, string password)
         {
             var user = GetByEmail(email);
-            if(user == null)
+            if (user == null)
             {
                 return null;
             }
@@ -40,10 +40,10 @@ namespace EDIConverterWeb.Data
             using var ctx = new EDIDbContext(_connectionString);
             return ctx.Users.FirstOrDefault(u => u.Email == email);
         }
-        //public bool UserExistsForThisEmail(string email)
-        //{
-        //    using var ctx = new EDIDbContext(_connectionString);
-        //    return ctx.Users.Any(u => u.Email == email);
-        //}
+        public bool UserExistsForThisEmail(string email)
+        {
+            using var ctx = new EDIDbContext(_connectionString);
+            return ctx.Users.Any(u => u.Email == email);
+        }
     }
 }
