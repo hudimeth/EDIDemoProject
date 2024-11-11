@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EDIConverterWeb.Data.Migrations
 {
     [DbContext(typeof(EDIDbContext))]
-    [Migration("20240912084247_Initial")]
+    [Migration("20241111080142_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
