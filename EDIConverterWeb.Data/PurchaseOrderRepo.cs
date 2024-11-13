@@ -54,7 +54,6 @@ namespace EDIConverterWeb.Data
             var purchaseOrder = new PurchaseOrder();
             string lineItemsText = "";
 
-            //now it only validates the info based on the lines and specific segments that we take info from
             bool validBEGSegment = false;
             bool validN1Segment = false;
             bool validN3Segment = false;
@@ -97,12 +96,19 @@ namespace EDIConverterWeb.Data
                     {
                         var newSegment = segment.Remove(segment.Length - 1);
                         var eachN3SegmentSeparated = newSegment.Split('*');
-                        if (eachN3SegmentSeparated.Count() == 2)
+                        var N3SegmentCount = eachN3SegmentSeparated.Count();
+                        if ( N3SegmentCount== 2 || N3SegmentCount == 3)
                         {
+                            //right now i'm not making sure that the n3-02 segment isn't empty- I'm allowing there to be a star there without more info
                             if (eachN3SegmentSeparated[0] != "" && eachN3SegmentSeparated[1] != "")
                             {
                                 validN3Segment = true;
                                 purchaseOrder.StreetAddress = eachN3SegmentSeparated[1];
+                                if (N3SegmentCount == 3)
+                                {
+                                    purchaseOrder.StreetAddress += ", ";
+                                    purchaseOrder.StreetAddress += eachN3SegmentSeparated[2];
+                                }
                             }
                         }
                     }
